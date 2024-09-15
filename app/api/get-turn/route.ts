@@ -1,6 +1,6 @@
 import { kv } from "@vercel/kv";
 
-export async function GET(req: any) {
+export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const key = searchParams.get("key");
@@ -15,7 +15,7 @@ export async function GET(req: any) {
       );
     }
 
-    // Retrieve the turn by key
+    // Retrieve the specific turn by key
     const turn = await kv.get(key);
 
     if (!turn) {
@@ -28,17 +28,15 @@ export async function GET(req: any) {
       );
     }
 
+    // Return all fields, including the new ones
     return new Response(JSON.stringify({ success: true, turn }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    return new Response(JSON.stringify({ success: false, error: error }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

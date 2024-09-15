@@ -18,11 +18,11 @@ export async function GET() {
       keys.map(async (key) => {
         const turn = await kv.get(key);
 
-        // Ensure that `turn` is an object before spreading
+        // Ensure turn is valid and include key in the response
         if (turn && typeof turn === "object") {
-          return { key, ...turn }; // Include key in the response for clarity
+          return { key, ...turn };
         } else {
-          return { key, error: "Invalid turn data" }; // Handle cases where turn is not an object
+          return { key, error: "Invalid turn data" };
         }
       }),
     );
@@ -34,12 +34,9 @@ export async function GET() {
   } catch (error) {
     console.error("Error retrieving conversation turns:", error);
 
-    return new Response(
-      JSON.stringify({ success: false, error: error.message }), // Use error.message for cleaner error message
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    return new Response(JSON.stringify({ success: false, error: error }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

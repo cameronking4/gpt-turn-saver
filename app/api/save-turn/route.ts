@@ -1,24 +1,29 @@
 import { kv } from "@vercel/kv";
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   try {
-    // Extract data from the request body
-    const { userMessage, aiResponse, turnSummary, taskCompleted } =
-      await req.json();
+    // Extract query parameters from the URL
+    const url = new URL(req.url);
+    const userMessage = url.searchParams.get("userMessage");
+    const aiResponse = url.searchParams.get("aiResponse");
+    const turnSummary = url.searchParams.get("turnSummary");
+    const taskCompletedParam = url.searchParams.get("taskCompleted");
 
-    // Validate required fields
+    // Validate required fields and taskCompleted should be a boolean
+    const taskCompleted = taskCompletedParam === "true" ? true : false;
+
     if (
       !userMessage ||
       !aiResponse ||
       !turnSummary ||
-      typeof taskCompleted !== "boolean"
+      taskCompletedParam === null
     ) {
       return new Response(
         JSON.stringify({ success: false, error: "Missing or invalid fields" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     }
 
